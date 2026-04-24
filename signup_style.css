@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: #1e1e28;
+  --accent: #7c6dfa;
+  --text: #f0f0f0;
+  --text-muted: #6b6b7a;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── SQUIRREL GHOST ── */
+.bg-squirrel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  opacity: 0.035;
+  z-index: 0;
+  filter: grayscale(100%);
+  pointer-events: none;
+}
+
+/* ── LAYOUT ── */
+.main-container {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  z-index: 1;
+  position: relative;
+  padding: 2rem;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 200px;
+  filter: drop-shadow(0 0 20px rgba(124,109,250,0.3));
+}
+
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--text);
+}
+
+.left-panel p {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ── LOGIN CARD ── */
+.login-card {
+  width: 400px;
+  padding: 40px 36px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.login-card h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.login-card input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid var(--border);
+  outline: none;
+  border-radius: 10px;
+  padding: 0 14px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+
+.login-card input::placeholder { color: var(--text-muted); }
+.login-card input:focus { border-color: var(--accent); }
+
+.forgot-box { text-align: right; margin-bottom: 18px; }
+.forgot-box a { font-size: 12px; color: var(--accent); text-decoration: none; }
+
+button[type="submit"] {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+button[type="submit"]:hover {
+  background: #6a5cf0;
+  transform: translateY(-1px);
+}
+
+.signup-text {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.signup-text a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.divider span { flex: 1; height: 1px; background: var(--border); }
+.divider p { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.social-icons i {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.social-icons i:hover { border-color: var(--accent); color: var(--accent); }
+
+.error {
+  margin-top: 12px;
+  color: #ef4444;
+  text-align: center;
+  font-size: 13px;
+  padding: 8px;
+  background: rgba(239,68,68,0.08);
+  border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+  .main-container { flex-direction: column; gap: 24px; }
+  .login-card { width: 100%; max-width: 400px; padding: 28px 20px; }
+  .bg-squirrel { width: 280px; }
+}

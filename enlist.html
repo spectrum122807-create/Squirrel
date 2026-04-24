@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='enlist_style.css') }}">
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon"><img src="{{ url_for('static',filename='squirrel_logo-removebg-preview.png')}}"></div>
+      <span class="logo-text">Squirrel</span>
+    </div>
+    <span class="page-title">Listings</span>
+    <a href="/dashboard" style="font-size:17px;color:#534AB7;text-decoration:none;font-weight:500;">← Back</a>
+
+  </nav>
+
+  <div class="feed">
+    {% if all_listings %}
+    {% for item in all_listings %}
+    <div class="card">
+      <div class="card-header">
+        <div class="user-info">
+          <div class="avatar">{{ item[4][0].upper() }}</div>
+          <div>
+            <p class="username">{{ item[4] }}</p>
+            <p class="time">{{ item[5][:10] }}</p>
+          </div>
+        </div>
+        <span class="badge">Open</span>
+      </div>
+
+      <p class="card-title">{{ item[1] }}</p>
+      <p class="card-desc">{{ item[2] }}</p>
+      {% if item[3] %}
+      <p class="card-price">₹{{ item[3] }}</p>
+      {% endif %}
+
+      <div class="card-actions">
+        <button class="btn-primary">listed sucessfully</button>
+
+
+        {% if item[4] == username %}
+        <a href="/delete_listing/{{ item[0] }}" onclick="return confirm('Delete this listing?')"
+          class="btn-delete">Delete</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="empty">No listings yet. Be the first to sell!</p>
+    {% endif %}
+  </div>
+
+  <button class="fab" onclick="document.getElementById('modal').style.display='flex'">
+    + Enlist a Product
+  </button>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Enlist a Product</h3>
+        <span class="close" onclick="document.getElementById('modal').style.display='none'">✕</span>
+      </div>
+      <form method="POST" action="/enlist">
+        <input type="text" name="title" placeholder="What are you selling?" required />
+        <textarea name="description" placeholder="Describe the product — condition, age, any defects..."
+          rows="3"></textarea>
+        <input type="number" name="price" placeholder="Price in ₹" />
+        <button type="submit" class="btn-submit">Post Listing</button>
+      </form>
+    </div>
+  </div>
+<script>
+  // Load saved theme on page load
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-icon').textContent = savedTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('theme-icon').textContent = next === 'light' ? 'Dark Mode' : 'Light Mode';
+  }
+</script>
+</body>
+
+</html>

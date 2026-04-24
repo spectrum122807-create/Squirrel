@@ -1,0 +1,29 @@
+
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 5px;                      /* Space between squirrel and text */
+}
+.logo-icon img {
+    height: 60px;                   /* Constrains the image to fit the bar */
+    width: auto;
+    display: block;
+    object-fit: contain;
+    
+    /* Ensure no extra margins are pushing the text away */
+    margin: 0;
+}
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f0f0f0; /* was #333 which is dark/invisible on dark bg */
+}
+.notif-card {
+  background: #1c1c1f;
+  border: 1px solid #2a2a2f;
+  border-radius: 14px;
+  padding: 1rem 1.3rem;
+  margin-bottom: 12px;
+  color: #f0f0f0;
+}

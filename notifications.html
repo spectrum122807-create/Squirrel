@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications — Squirrel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+
+   
+    {% set notif_count = notif_count | default(0) %}
+{% set request_notif_count = request_notif_count | default(0) %}
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">
+        <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}" >
+      </div>
+      <span class="logo-text">Squirrel</span>
+    </div>
+    <span style="font-size:14px;font-weight:600;color:#534AB7;">Notifications</span>
+    <a href="/dashboard" style="font-size:17px;color:#534AB7;text-decoration:none;font-weight:500;">← Back</a>
+  </nav>
+
+  <div class="feed">
+    {% if notifs %}
+      {% for notif in notifs %}
+
+      {% if notif[2] == 0 %}
+      <div class="card unread-card">
+      {% else %}
+      <div class="card">
+      {% endif %}
+
+        <div class="notif-card">
+          <div class="notif-icon">🔔</div>
+          <div style="flex:1;">
+            {% if notif[2] == 0 %}
+            <p class="notif-msg unread">{{ notif[1] }}</p>
+            {% else %}
+            <p class="notif-msg" >{{ notif[1] }} </p>
+            {% endif %}
+            <p class="notif-time">{{ notif[3][:10] }}</p>
+{% if '✓' not in notif[1] and 'interested' in notif[1] %}
+{% set buyer = notif[1].split(' ')[0] %}
+<div style="display:flex; gap:8px; margin-top:8px;">
+    <a href="/agree/{{ notif[0] }}"
+       onclick="return confirm('Agree to this exchange?')"
+       class="agree-btn">✓ Agree</a>
+    <a href="/chat/{{ buyer }}" class="agree-btn" style="background:#1c1c1f; border:1px solid #3a3a45;">💬 Chat</a>
+</div>
+{% endif %}
+
+          </div>
+          {% if notif[2] == 0 %}
+          <span class="notif-dot"></span>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="empty-state">
+        <p style="font-size:32px;margin-bottom:12px;">🔔</p>
+        <p style="font-size:14px;color:#aaa;">No notifications yet</p>
+      </div>
+    {% endif %}
+  </div>
+
+</body>
+</html>

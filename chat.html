@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ receiver }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">
+        <div class="logo-icon">
+            <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}">
+        </div>
+        <span class="logo-text">Squirrel</span>
+    </div>
+</nav>
+
+<div class="chat-wrapper">
+    <div class="chat-header">
+        <div class="avatar">{{ receiver[0].upper() }}</div>
+        <h2>{{ receiver }}</h2>
+        <a href="/dashboard">← Back</a>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        {% for msg in messages %}
+        <div class="msg {% if msg[0] == username %}sent{% else %}received{% endif %}">
+            {{ msg[1] }}
+            <div class="msg-time">{{ msg[2][11:16] }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input-row">
+        <input type="text" id="msgInput" placeholder="Type a message..." autocomplete="off"/>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    const socket = io();
+    const username = "{{ username }}";
+    const receiver = "{{ receiver }}";
+
+    // Join the private room
+    socket.emit("join", { receiver: receiver });
+
+    // Scroll to bottom
+    const chatBox = document.getElementById("chatBox");
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Send on Enter key
+    document.getElementById("msgInput").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+        const input = document.getElementById("msgInput");
+        const message = input.value.trim();
+        if (!message) return;
+        socket.emit("send_message", { receiver: receiver, message: message });
+        input.value = "";
+    }
+
+    // Receive message
+    socket.on("receive_message", function(data) {
+        const div = document.createElement("div");
+        div.classList.add("msg");
+        div.classList.add(data.sender === username ? "sent" : "received");
+        div.innerHTML = data.message + '<div class="msg-time">now</div>';
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,278 @@
+{% set notif_count = notif_count if notif_count is defined else 0 %}
+{% set request_notif_count = request_notif_count if request_notif_count is defined else 0 %}
+{% set user_availabilities = user_availabilities if user_availabilities is defined else [] %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requests — Squirrel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+  <style>
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7c6dfa;
+      margin: 1rem 0 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .time {
+      font-size: 11px;
+      color: #6b6b7a;
+    }
+
+    .card-budget {
+      font-size: 13px;
+      color: #f97316;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .btn-delete {
+      padding: 7px 14px;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-delete:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    .page-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #7c6dfa;
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 12px 22px;
+      background: #7c6dfa;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(124, 109, 250, 0.4);
+    }
+
+    .fab:hover {
+      background: #6a5cf0;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      background: #1c1c1f;
+      border: 1px solid #2a2a2f;
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f0f0f0;
+    }
+
+    .close {
+      cursor: pointer;
+      color: #6b6b7a;
+      font-size: 18px;
+    }
+
+    .modal input,
+    .modal textarea {
+      width: 100%;
+      padding: 9px 14px;
+      background: #0d0d0f;
+      border: 1px solid #2a2a2f;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-size: 13px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .modal input:focus,
+    .modal textarea:focus {
+      border-color: #7c6dfa;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 10px;
+      background: #7c6dfa;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      background: #6a5cf0;
+    }
+
+    .btn-interested {
+      background: #626463 ;
+      color: white ;
+      border-color: #646564 ;
+    }
+
+    .btn-undo {
+      color: #ef4444 ;
+      border-color: #ef4444 ;
+    }
+
+    .btn-undo:hover {
+      background: #ef4444 ;
+      color: white ;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">
+        <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}">
+      </div>
+      <span class="logo-text">Squirrel</span>
+    </div>
+    <span class="page-title">Requests</span>
+    <a href="/dashboard" style="font-size:14px; color:#7c6dfa; text-decoration:none; font-weight:500;">← Back</a>
+  </nav>
+
+  <div class="feed">
+
+    {% if my_requests %}
+    <p class="section-label">Your Requests</p>
+    {% for item in my_requests %}
+    <div class="card">
+      <div class="card-header">
+        <div class="user-info">
+          <div class="avatar">{{ item[4][0].upper() }}</div>
+          <div>
+            <p class="username">{{ item[4] }} <span style="font-size:10px; color:#7c6dfa; font-weight:600;">YOU</span>
+            </p>
+            <p class="time">{{ item[5][:10] }}</p>
+          </div>
+        </div>
+        <span class="badge">Open</span>
+      </div>
+      <p class="card-title">{{ item[1] }}</p>
+      <p class="card-desc">{{ item[2] }}</p>
+      {% if item[3] %}
+      <p class="card-budget">Budget: Rs {{ item[3] }}</p>
+      {% endif %}
+      <div class="card-actions">
+        <a href="/delete_request/{{ item[0] }}" onclick="return confirm('Delete this request?')"
+          class="btn-delete">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if other_requests %}
+    <p class="section-label" style="margin-top:1.5rem;">All Requests</p>
+    {% for item in other_requests %}
+    <div class="card">
+      <div class="card-header">
+        <div class="user-info">
+          <div class="avatar">{{ item[4][0].upper() }}</div>
+          <div>
+            <p class="username">{{ item[4] }}</p>
+            <p class="time">{{ item[5][:10] }}</p>
+          </div>
+        </div>
+        <span class="badge">Open</span>
+      </div>
+      <p class="card-title">{{ item[1] }}</p>
+      <p class="card-desc">{{ item[2] }}</p>
+      {% if item[3] %}
+      <p class="card-budget">Budget: Rs {{ item[3] }}</p>
+      {% endif %}
+      <div class="card-actions">
+        {% if item[0] in user_availabilities %}
+        <button class="btn-primary btn-interested"> I have this</button>
+        <a href="/unhave/{{ item[0] }}"><button class="btn-secondary btn-undo">Undo</button></a>
+        {% else %}
+        <a href="/have/{{ item[0] }}"><button class="btn-primary" style="width: 400px;">I have this</button></a>
+        {% endif %}
+        <a href="/chat/{{ item[4] }}" style="text-decoration:none;">
+          <button class="btn-secondary">💬 Chat</button>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="empty">No other requests yet.</p>
+    {% endif %}
+
+  </div>
+
+  <button class="fab" onclick="document.getElementById('modal').style.display='flex'">+ Post a Request</button>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Post a Request</h3>
+        <span class="close" onclick="document.getElementById('modal').style.display='none'">✕</span>
+      </div>
+      <form method="POST" action="/request">
+        <input type="text" name="title" placeholder="What are you looking for?" required />
+        <textarea name="description" placeholder="Add details — condition, preference, urgency..." rows="3"></textarea>
+        <input type="number" name="budget" placeholder="Budget in Rs (optional)" />
+        <button type="submit" class="btn-submit">Post Request</button>
+      </form>
+    </div>
+  </div>
+<script>
+  // Load saved theme on page load
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-icon').textContent = savedTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('theme-icon').textContent = next === 'light' ? 'Dark Mode' : 'Light Mode';
+  }
+</script>
+</body>
+
+</html>

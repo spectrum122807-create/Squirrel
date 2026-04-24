@@ -1,0 +1,233 @@
+{% set notif_count = notif_count if notif_count is defined else 0 %}
+{% set request_notif_count = request_notif_count if request_notif_count is defined else 0 %}
+{% set chat_notif_count = chat_notif_count if chat_notif_count is defined else 0 %}
+{% set user_interests = user_interests if user_interests is defined else [] %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squirrel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="logo-icon">
+      <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}">
+    </div>
+    <span class="logo-text">Squirrel</span>
+  </div>
+
+  <div class="nav-search">
+    <input type="text" id="search-input" placeholder="Search product..." autocomplete="off"/>
+  </div>
+
+  <div class="notif-btn" onclick="window.location='/notifications'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    {% if notif_count > 0 %}
+    <span class="notif-dot">{{ notif_count }}</span>
+    {% endif %}
+  </div>
+
+  <div class="profile-wrapper">
+    <div class="profile-avatar" onclick="toggleProfileDropdown()">
+      {{ username[0].upper() }}
+    </div>
+    <div class="profile-dropdown" id="profileDropdown">
+      <div class="dropdown-avatar">
+        {{ username[0].upper() }}       
+      </div>
+      <p class="dropdown-username">{{ username }}</p>
+      <div class="dropdown-row">
+        <span class="dropdown-label">Room</span>
+        <span class="dropdown-value">{{ room_number or "nill" }}</span>
+      </div>
+      <div class="dropdown-row">
+        <span class="dropdown-label">Listings</span>
+        <span class="dropdown-value">{{ listing_count }}</span>
+      </div>  
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <span id="theme-icon">Light Mode</span>
+      </div>
+      <a href="/logout"><button class="dropdown_logout">Log Out</button></a>
+    </div>
+  
+  </div>
+</nav>
+
+<script>
+  function toggleProfileDropdown() {
+    document.getElementById("profileDropdown").classList.toggle("show");
+  }
+  document.addEventListener("click", function(e) {
+    const wrapper = document.querySelector(".profile-wrapper");
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById("profileDropdown").classList.remove("show");
+    }
+  });
+</script>
+
+<div class="action-strip">
+  <a href="/enlist"><button class="enlist_button">+ Enlist a Product</button></a>
+  <a href="/request">
+    <button class="request_button">
+      Requests
+      {% if request_notif_count > 0 %}
+      <span class="request-dot">{{ request_notif_count }}</span>
+      {% endif %}
+    </button>
+  </a>
+  
+</div>
+
+<div class="feed">
+  <h2 class="section-title">Recent Listings</h2>
+
+  {% if listings %}
+    {% for item in listings %}
+      {% if item[5] == 'closed' %}
+      <div class="card sold-card">
+      {% else %}
+      <div class="card">
+      {% endif %}
+
+        <div class="card-header">
+          <div class="user-info">
+            <div class="avatar">{{ item[4][0].upper() }}</div>
+            <div>
+              <p class="username">{{ item[4] }}</p>
+            </div>
+          </div>
+          {% if item[5] == 'closed' %}
+          <span class="badge-sold">Sold</span>
+          {% else %}
+          <span class="badge">Open</span>
+          {% endif %}
+        </div>
+
+        <p class="card-title">{{ item[1] }}</p>
+        <p class="card-desc">{{ item[3] }}</p>
+
+        {% if item[2] %}
+        <p class="card-price">Rs {{ item[2] }}</p>
+        {% endif %}
+
+        <div class="card-actions">
+          {% if item[5] == 'closed' %}
+            <span class="own-badge">No longer available</span>
+          {% elif item[4] != username %}
+            {% if item[0] in user_interests %}
+              <a href="/want/{{ item[0] }}" class="btn-primary btn-interested" style="text-decoration:none; text-align:center;"> Interested</a>
+              <a href="/unwant/{{ item[0] }}"><button class="btn-secondary btn-undo">Undo</button></a>
+              <style>
+                 .btn-undo { color:#ef4444 !important; border-color:#ef4444 !important; }
+             .btn-undo:hover { background:#ef4444 !important; color:white !important; }
+              </style>
+            {% else %}
+              <a href="/want/{{ item[0] }}" class="btn-primary" style="text-decoration:none; text-align:center;">I want this</a>
+            {% endif %}
+            <a href="/chat/{{ item[4] }}" style="text-decoration:none;">
+              <button class="btn-secondary">
+                Chat
+                {% if chat_notif_count > 0 %}
+                <span class="request-dot">{{ chat_notif_count }}</span>
+                {% endif %}
+              </button>
+            </a>
+          {% else %}
+            <span class="own-badge">Your listing</span>
+          {% endif %}
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No listings yet — be the first to sell something!</p>
+  {% endif %}
+
+</div>
+
+<script>
+  const searchInput = document.getElementById("search-input");
+  const feed = document.querySelector(".feed");
+  const sectionTitle = document.querySelector(".section-title");
+  let debounceTimer;
+
+  function renderCards(results, query) {
+    sectionTitle.textContent = query ? `Results for "${query}"` : "Recent Listings";
+    if (results.length === 0) {
+      feed.innerHTML = `<h2 class="section-title">${sectionTitle.textContent}</h2>
+        <p class="empty">No listings found for "${query}"</p>`;
+      return;
+    }
+    const currentUser = "{{ username }}";
+    const cards = results.map(item => {
+      const isSold = item.status === "closed";
+      const isOwn = item.username === currentUser;
+      const actions = isSold
+        ? `<span class="own-badge">No longer available</span>`
+        : isOwn
+        ? `<span class="own-badge">Your listing</span>`
+        : `<a href="/want/${item.id}" class="btn-primary" style="text-decoration:none;">I want this</a>
+           <a href="/chat/${item.username}" style="text-decoration:none;"><button class="btn-secondary">Chat</button></a>`;
+      const badge = isSold ? `<span class="badge-sold">Sold</span>` : `<span class="badge">Open</span>`;
+      const price = item.price ? `<p class="card-price">Rs ${item.price}</p>` : "";
+      return `
+        <div class="card ${isSold ? "sold-card" : ""}">
+          <div class="card-header">
+            <div class="user-info">
+              <div class="avatar">${item.username[0].toUpperCase()}</div>
+              <div><p class="username">${item.username}</p></div>
+            </div>
+            ${badge}
+          </div>
+          <p class="card-title">${item.title}</p>
+          <p class="card-desc">${item.description}</p>
+          ${price}
+          <div class="card-actions">${actions}</div>
+        </div>`;
+    }).join("");
+    feed.innerHTML = `<h2 class="section-title">${sectionTitle.textContent}</h2>${cards}`;
+  }
+
+  searchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    const query = searchInput.value.trim();
+    debounceTimer = setTimeout(() => {
+      fetch(`/search?q=${encodeURIComponent(query)}`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      }).then(res => res.json()).then(data => renderCards(data.results, query));
+    }, 300);
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      clearTimeout(debounceTimer);
+      const query = searchInput.value.trim();
+      fetch(`/search?q=${encodeURIComponent(query)}`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      }).then(res => res.json()).then(data => renderCards(data.results, query));
+    }
+  });
+</script>
+<script>
+  // Load saved theme on page load
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-icon').textContent = savedTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('theme-icon').textContent = next === 'light' ? 'Dark Mode' : 'Light Mode';
+  }
+</script>
+</body>
+</html>

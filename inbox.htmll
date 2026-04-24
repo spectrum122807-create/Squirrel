@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox — Squirrel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+    <style>
+        .inbox-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.3rem;
+            background: #141416;
+            border: 1px solid #2a2a2f;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .inbox-card:hover {
+            border-color: #7c6dfa;
+            transform: translateY(-2px);
+        }
+        .inbox-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f0f0f0;
+            margin-bottom: 3px;
+        }
+        .inbox-preview {
+            font-size: 12px;
+            color: #6b6b7a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+        }
+        .inbox-time {
+            margin-left: auto;
+            font-size: 11px;
+            color: #6b6b7a;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">
+        <div class="logo-icon">
+            <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}">
+        </div>
+        <span class="logo-text">Squirrel</span>
+    </div>
+    <span style="font-size:14px;font-weight:600;color:#7c6dfa;">Inbox</span>
+    <a href="/dashboard" style="font-size:13px;color:#7c6dfa;text-decoration:none;">← Back</a>
+</nav>
+
+<div class="feed">
+    <h2 class="section-title">Messages</h2>
+
+    {% if conversations %}
+        {% for convo in conversations %}
+        <a href="/chat/{{ convo[0] }}" class="inbox-card">
+            <div class="avatar">{{ convo[0][0].upper() }}</div>
+            <div style="flex:1; min-width:0;">
+                <p class="inbox-name">{{ convo[0] }}</p>
+                <p class="inbox-preview">{{ convo[2] or 'No messages yet' }}</p>
+            </div>
+            <span class="inbox-time">{{ convo[1][11:16] }}</span>
+        </a>
+        {% endfor %}
+    {% else %}
+        <div class="empty">No conversations yet</div>
+    {% endif %}
+</div>
+
+</body>
+</html>

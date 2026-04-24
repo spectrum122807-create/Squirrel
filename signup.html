@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='signup_style.css') }}">
+
+<body>
+    <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}" class="bg-squirrel">
+<div class="main-container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-panel">
+        <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}" class="logo">
+        <img src="{{ url_for('static', filename='squirrel_logo.jpg') }}" class="bg-squirrel">
+        <h1 class="logo-text">SQUIRREL</h1>
+       
+        <p>- Our digital Market place -</p>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="login-card">
+
+        <h2>Sign up</h2>
+
+        <form method="POST" action="/signup">
+
+            <input type="text" name="username" placeholder="Enter Username" required>
+
+            <input type="password" name="password" placeholder="Set Password" required>
+            <input type="text" name="room_number" placeholder="Enter Room Number" required>
+          
+
+           <a href="/dashboard"><button type="submit">sign up</button></a> 
+
+            <p class="signup-text">
+                Already have an account?
+                <a href="/">Log in</a>
+            </p>
+
+            
+
+        </form>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="bottom-text">
+    
+</div>
+
+</body>
+
+</html>
