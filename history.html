@@ -1,0 +1,128 @@
+{% set notif_count = notif_count if notif_count is defined else 0 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listing History — Squirrel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+  <style>
+    .history-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .repost-btn {
+      padding: 7px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .repost-btn:hover { background: #6a5cf0; }
+    .delete-history-btn {
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid rgba(239,68,68,0.4);
+      color: #ef4444;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .delete-history-btn:hover { background: #ef4444; color: white; }
+    .page-title { font-size: 14px; font-weight: 600; color: var(--accent); }
+    
+ [data-theme="light"] {
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface2: #f0f0f0;
+  --border: #e0e0e0;
+  --text: #111111;
+  --text-muted: #555555;
+  --text-dim: #666666;
+}
+
+
+
+
+
+
+
+[data-theme="light"] .navbar {
+  background: rgba(255,255,255,0.9);
+  border-color: #e0e0e0;
+}
+
+
+[data-theme="light"] input {
+  background: #f0f0f0;
+  color: #111;
+  border-color: #ddd;
+}
+
+[data-theme="light"] textarea {
+  background: #f0f0f0;
+  color: #111;
+  border-color: #ddd;
+}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="logo-icon">
+      <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}" alt="Squirrel logo">
+    </div>
+    <span class="logo-text">Squirrel</span>
+  </div>
+  <span class="page-title">Listing History</span>
+  <a href="/enlist" style="font-size:14px; color:var(--accent); text-decoration:none; font-weight:500;">← Back</a>
+</nav>
+
+<div class="feed">
+  <h2 class="section-title">Past Listings</h2>
+
+  {% if history_items %}
+    {% for item in history_items %}
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <p class="card-title" style="margin-bottom:2px;">{{ item[1] }}</p>
+          <p class="history-meta">Listed on {{ item[4][:10] }}</p>
+        </div>
+        {% if item[3] %}
+        <p class="card-price">Rs {{ item[3] }}</p>
+        {% endif %}
+      </div>
+      {% if item[2] %}
+      <p class="card-desc">{{ item[2] }}</p>
+      {% endif %}
+      <div class="card-actions" style="margin-top:10px;">
+        <a href="/repost/{{ item[0] }}" class="repost-btn">↺ Repost</a>
+        <a href="/delete_history/{{ item[0] }}"
+           onclick="return confirm('Remove from history?')"
+           class="delete-history-btn">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No listing history yet — sold listings will appear here.</p>
+  {% endif %}
+</div>
+
+<script>
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+{% set notif_count = notif_count if notif_count is defined else 0 %}
+{% set request_notif_count = request_notif_count if request_notif_count is defined else 0 %}
+{% set user_availabilities = user_availabilities if user_availabilities is defined else [] %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requests — Squirrel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='request_style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="logo-icon">
+      <img src="{{ url_for('static', filename='squirrel_logo-removebg-preview.png') }}">
+    </div>
+    <span class="logo-text">Squirrel</span>
+  </div>
+  <span class="page-title">Requests</span>
+  <a href="/dashboard" style="font-size:14px;  text-decoration:none; font-weight:500;">← Back</a>
+</nav>
+
+<div class="feed">
+
+  {% if my_requests %}
+  <p class="section-label">Your Requests</p>
+  {% for item in my_requests %}
+  <div class="card">
+    <div class="card-header">
+      <div class="user-info">
+        <div class="avatar">{{ item[4][0].upper() }}</div>
+        <div>
+          <p class="username">{{ item[4] }} <span style="font-size:10px; color:#7c6dfa; font-weight:600;">YOU</span></p>
+          <p class="time">{{ item[5][:10] }}</p>
+        </div>
+      </div>
+      <span class="badge">Open</span>
+    </div>
+    <p class="card-title">{{ item[1] }}</p>
+    <p class="card-desc">{{ item[2] }}</p>
+    {% if item[3] %}
+    <p class="card-budget">Budget: Rs {{ item[3] }}</p>
+    {% endif %}
+    <div class="card-actions">
+      <a href="/delete_request/{{ item[0] }}" onclick="return confirm('Delete this request?')" class="btn-delete">Delete</a>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if other_requests %}
+  <p class="section-label" style="margin-top:1.5rem;">All Requests</p>
+  {% for item in other_requests %}
+  <div class="card">
+    <div class="card-header">
+      <div class="user-info">
+        <div class="avatar">{{ item[4][0].upper() }}</div>
+        <div>
+          <p class="username">{{ item[4] }}</p>
+            {% if item[6] %}
+    <p style="font-size:10px; color:var(--text-muted);">Room {{ item[6] }}</p>
+    {% endif %}
+          <p class="time">{{ item[5][:10] }}</p>
+        </div>
+      </div>
+      <span class="badge">Open</span>
+    </div>
+    <p class="card-title">{{ item[1] }}</p>
+    <p class="card-desc">{{ item[2] }}</p>
+    {% if item[3] %}
+    <p class="card-budget">Budget: Rs {{ item[3] }}</p>
+    {% endif %}
+    <div class="card-actions">
+      {% if item[0] in user_availabilities %}
+        <button class="btn-primary btn-interested">I have this</button>
+       
+        <a href="/unhave/{{ item[0] }}"><button class="btn-secondary btn-undo">Undo</button></a>
+        <a href="/chat/{{ item[4] }}" style="text-decoration:none;">
+          <button class="btn-secondary">Chat</button>
+        </a>
+      {% else %}
+        <a href="/have/{{ item[0] }}" style="flex:1; text-decoration:none;">
+          <button class="btn-primary">I have this</button>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="empty">No other requests yet.</p>
+  {% endif %}
+
+</div>
+
+<button class="fab" onclick="document.getElementById('modal').style.display='flex'">+ Post a Request</button>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Post a Request</h3>
+      <span class="close" onclick="document.getElementById('modal').style.display='none'">X</span>
+    </div>
+    <form method="POST" action="/request">
+      <input type="text" name="title" placeholder="What are you looking for?" required />
+      <textarea name="description" placeholder="Add details..." rows="3"></textarea>
+      <input type="number" name="budget" placeholder="Budget in Rs (optional)" />
+      <button type="submit" class="btn-submit">Post</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  socket.on("refresh", function() {
+    window.location.reload();
+  });
+</script>
+
+</body>
+</html>
