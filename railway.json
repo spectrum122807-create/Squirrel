@@ -1,0 +1,10 @@
+{
+  "$schema": "https://railway.app",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "gunicorn --worker-class eventlet -w 1 app:app",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
